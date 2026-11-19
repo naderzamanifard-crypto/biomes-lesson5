@@ -9,7 +9,9 @@
 * {
   box-sizing: border-box;
 }
-
+<a href="Jimmy.html" style="display:block; text-align:center; background:#16a085; color:white; padding:15px; margin:25px; border-radius:15px; font-size:20px; text-decoration:none;">
+🎮 ورود به بازی مأموریت نجات زیست‌بوم‌ها
+</a>
 body {
   margin: 0;
   font-family: Tahoma, sans-serif;
