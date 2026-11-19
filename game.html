@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مأموریت نجات زیست‌بوم‌ها | مطالعات نهم</title>
+<style>
+:root{--navy:#102a43;--green:#16845b;--mint:#e9fff4;--gold:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#d9f3e5,#dceeff);color:#183047;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:18px}
+.game{width:min(760px,100%);background:#fff;border-radius:25px;overflow:hidden;box-shadow:0 18px 55px #17324d30}
+header{background:linear-gradient(120deg,#103b39,#16845b);color:white;text-align:center;padding:27px 18px}
+header .planet{font-size:48px}
+h1{font-size:clamp(22px,5vw,32px);margin:8px 0}
+header p{margin:8px 0 0;color:#d9ffed}
+main{padding:22px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-bottom:18px}
+.stat{background:#f0f7f5;padding:10px 14px;border-radius:13px;font-weight:bold;flex:1;text-align:center;min-width:105px}
+.progress{height:10px;background:#e6eeee;border-radius:20px;overflow:hidden;margin:12px 0 22px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#16a36d,#9bdc56);transition:width .3s}
+.tag{display:inline-block;background:#e7f7ef;color:#14734e;padding:7px 12px;border-radius:30px;font-size:13px;font-weight:bold}
+h2{font-size:21px;margin:15px 0}
+.question{font-size:19px;line-height:1.9;font-weight:bold;margin:18px 0}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:14px;padding:14px 12px;transition:.18s}
+.answer{background:#f2f6f8;color:#183047;border:2px solid transparent;text-align:right;font-weight:bold}
+.answer:hover{border-color:#58b88c;background:#effbf5;transform:translateY(-2px)}
+.answer:disabled{cursor:default;transform:none}
+.answer.correct{background:#d9f8e7;border-color:#20a568;color:#12633f}
+.answer.wrong{background:#ffe4e4;border-color:#e05c5c;color:#9a2929}
+.feedback{min-height:58px;margin:16px 0 8px;padding:13px;border-radius:13px;line-height:1.8;background:#f7fafb}
+.feedback.good{background:#e6f9ee;color:#12633f}.feedback.bad{background:#fff0ef;color:#9a2929}
+.next{display:block;width:100%;background:#16845b;color:white;font-weight:bold;font-size:17px;margin-top:12px}
+.next:hover{background:#106b49}
+.hidden{display:none}
+.center{text-align:center;padding:20px 5px}
+.big{font-size:58px}
+.small{font-size:13px;color:#617487;line-height:1.8}
+@media(max-width:520px){.answers{grid-template-columns:1fr}main{padding:17px}.question{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="game">
+<header>
+ <div class="planet">🌍</div>
+ <h1>مأموریت نجات زیست‌بوم‌ها</h1>
+ <p>بازی مطالعات اجتماعی پایه نهم | درس ۵</p>
+</header>
+<main>
+ <section id="quiz">
+  <div class="stats">
+   <div class="stat">⭐ امتیاز: <span id="score">۰</span></div>
+   <div class="stat">❤️ فرصت: <span id="lives">۳</span></div>
+   <div class="stat">🧩 سؤال: <span id="count">۱</span> از ۱۵</div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <span class="tag" id="stage">مرحله ۱: آشنایی با زیست‌بوم‌ها</span>
+  <div class="question" id="question"></div>
+  <div class="answers" id="answers"></div>
+  <div class="feedback" id="feedback">یکی از گزینه‌ها را انتخاب کن.</div>
+  <button class="next hidden" id="next">سؤال بعدی ←</button>
+  <p class="small">هر پاسخ درست ۱۰ امتیاز دارد. سه فرصت داری؛ با دقت جواب بده!</p>
+ </section>
+ <section id="result" class="center hidden">
+  <div class="big" id="medal">🏆</div>
+  <h2 id="resultTitle">آفرین!</h2>
+  <p id="resultText"></p>
+  <button class="next" onclick="restart()">🔄 بازی دوباره</button>
+ </section>
+</main>
+</div>
+<script>
+const questions=[
+{stage:"مرحله ۱: آشنایی با زیست‌بوم‌ها",q:"مهم‌ترین عامل در پراکندگی زیست‌بوم‌های جهان کدام است؟",a:["آب‌وهوا","تعداد شهرها","نوع ساختمان‌ها","راه‌های ارتباطی"],c:0,why:"آب‌وهوا، به‌ویژه دما و بارش، نقش مهمی در شکل‌گیری زیست‌بوم‌ها دارد."},
+{stage:"مرحله ۱: آشنایی با زیست‌بوم‌ها",q:"زیست‌بوم به چه معناست؟",a:["یک شهر بزرگ","ناحیه‌ای با گیاهان و جانوران و شرایط طبیعی مشابه","فقط محل زندگی انسان‌ها","یک نوع آب‌وهوا"],c:1,why:"زیست‌بوم ناحیه‌ای گسترده با آب‌وهوا، پوشش گیاهی و جانوری ویژه است."},
+{stage:"مرحله ۲: توندرا",q:"توندرا بیشتر در کدام نواحی دیده می‌شود؟",a:["نزدیک خط استوا","نواحی قطبی و بسیار سرد","کنار بیابان‌های گرم","جزایر گرمسیری"],c:1,why:"توندرا در عرض‌های جغرافیایی بالا و نزدیک قطب‌ها گسترش دارد."},
+{stage:"مرحله ۲: توندرا",q:"کدام ویژگی برای توندرا مناسب‌تر است؟",a:["درختان بلند و انبوه","بارندگی فراوان و گرمای دائمی","زمستان‌های طولانی و پوشش گیاهی کوتاه","تابستان‌های بسیار گرم"],c:2,why:"سرما و فصل رشد کوتاه باعث می‌شود گیاهان توندرا کوتاه باشند."},
+{stage:"مرحله ۳: تایگا",q:"تایگا بیشتر با کدام پوشش گیاهی شناخته می‌شود؟",a:["درختان سوزنی‌برگ","کاکتوس‌ها","علفزارهای گرمسیری","درختان نخل"],c:0,why:"جنگل‌های تایگا عمدتاً از درختان سوزنی‌برگ مانند کاج تشکیل شده‌اند."},
+{stage:"مرحله ۳: تایگا",q:"تایگا معمولاً در چه آب‌وهوایی قرار دارد؟",a:["گرم و مرطوب استوایی","سرد، با زمستان‌های طولانی","خشک و بی‌باران","گرم و مدیترانه‌ای"],c:1,why:"تایگا در نواحی سرد نیمکره شمالی و جنوب توندرا قرار دارد."},
+{stage:"مرحله ۴: جنگل‌های بارانی استوایی",q:"جنگل‌های بارانی استوایی در کدام منطقه گسترش دارند؟",a:["اطراف قطب جنوب","نزدیک خط استوا","مرکز قاره جنوبگان","نواحی قطبی شمال"],c:1,why:"این جنگل‌ها در نواحی گرم و پرباران اطراف خط استوا دیده می‌شوند."},
+{stage:"مرحله ۴: جنگل‌های بارانی استوایی",q:"کدام ویژگی در جنگل‌های بارانی استوایی دیده می‌شود؟",a:["بارش فراوان و تنوع زیستی زیاد","بارش بسیار کم","زمستان بسیار طولانی و یخبندان","نبود پوشش گیاهی"],c:0,why:"گرما و بارندگی فراوان، شرایط رشد گیاهان متنوع را فراهم می‌کند."},
+{stage:"مرحله ۵: ساوان",q:"ساوانا بیشتر چه نوع پوشش گیاهی دارد؟",a:["یخ و برف دائمی","علفزار با درختان پراکنده","جنگل انبوه سوزنی‌برگ","گیاهان بسیار کمِ بیابانی"],c:1,why:"ساوانا علفزار گرمسیری است که درختان پراکنده‌ای هم دارد."},
+{stage:"مرحله ۵: ساوان",q:"کدام جانور را بیشتر با ساوانای آفریقا می‌شناسیم؟",a:["گوزن شمالی","خرس قطبی","شیر","پنگوئن"],c:2,why:"شیر از جانوران شناخته‌شده علفزارهای ساوانای آفریقاست."},
+{stage:"مرحله ۶: بیابان‌ها",q:"ویژگی اصلی آب‌وهوای بیابان چیست؟",a:["بارندگی بسیار کم","بارندگی همیشگی","سرمای قطبی در همه فصل‌ها","رطوبت بسیار زیاد"],c:0,why:"کمبود بارش، ویژگی اصلی اقلیم بیابانی است."},
+{stage:"مرحله ۶: بیابان‌ها",q:"کدام گیاه با شرایط کم‌آبی بیابان سازگار است؟",a:["نیلوفر آبی","کاکتوس","خزه جنگلی","برنج"],c:1,why:"کاکتوس می‌تواند آب را ذخیره کند و در شرایط خشک زنده بماند."},
+{stage:"مرحله نهایی: چالش بزرگ",q:"کدام دو عامل آب‌وهوایی در پراکندگی زیست‌بوم‌ها اهمیت زیادی دارند؟",a:["دما و بارش","باد و آلودگی صوتی","جمعیت و صنعت","ارتفاع ساختمان و جاده"],c:0,why:"دما و میزان بارش از مهم‌ترین عوامل تعیین‌کننده نوع پوشش گیاهی‌اند."},
+{stage:"مرحله نهایی: چالش بزرگ",q:"کدام زیست‌بوم معمولاً بیشترین بارندگی را دارد؟",a:["بیابان گرم","توندرا","جنگل بارانی استوایی","تایگا"],c:2,why:"جنگل‌های بارانی استوایی بارش فراوانی در طول سال دریافت می‌کنند."},
+{stage:"مرحله نهایی: چالش بزرگ",q:"اگر منطقه‌ای بسیار سرد و دارای درختان سوزنی‌برگ باشد، احتمالاً چه زیست‌بومی است؟",a:["ساوانا","تایگا","بیابان گرم","جنگل بارانی استوایی"],c:1,why:"تایگا زیست‌بوم جنگل‌های سرد سوزنی‌برگ است."}
+];
+let index=0,score=0,lives=3,locked=false;
+const fa=n=>String(n).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]);
+function show(){
+ locked=false;const q=questions[index];
+ document.getElementById("score").textContent=fa(score);
+ document.getElementById("lives").textContent=fa(lives);
+ document.getElementById("count").textContent=fa(index+1);
+ document.getElementById("bar").style.width=(index/questions.length*100)+"%";
+ document.getElementById("stage").textContent=q.stage;
+ document.getElementById("question").textContent=q.q;
+ document.getElementById("feedback").className="feedback";
+ document.getElementById("feedback").textContent="یکی از گزینه‌ها را انتخاب کن.";
+ document.getElementById("next").classList.add("hidden");
+ const box=document.getElementById("answers");box.innerHTML="";
+ q.a.forEach((answer,i)=>{const b=document.createElement("button");b.className="answer";b.textContent=["الف) ","ب) ","ج) ","د) "][i]+answer;b.onclick=()=>choose(i,b);box.appendChild(b)});
+}
+function choose(i,button){
+ if(locked)return;locked=true;const q=questions[index];const buttons=[...document.querySelectorAll(".answer")];buttons.forEach(b=>b.disabled=true);
+ const f=document.getElementById("feedback");
+ if(i===q.c){score+=10;button.classList.add("correct");f.className="feedback good";f.textContent="آفرین! پاسخ درست است. "+q.why}
+ else{lives--;button.classList.add("wrong");buttons[q.c].classList.add("correct");f.className="feedback bad";f.textContent="این بار درست نبود. پاسخ صحیح: "+q.a[q.c]+". "+q.why}
+ document.getElementById("score").textContent=fa(score);document.getElementById("lives").textContent=fa(lives);
+ document.getElementById("next").textContent=(index===questions.length-1||lives===0)?"دیدن نتیجه 🏆":"سؤال بعدی ←";
+ document.getElementById("next").classList.remove("hidden");
+}
+document.getElementById("next").onclick=()=>{if(index===questions.length-1||lives===0){finish();return}index++;show()};
+function finish(){
+ document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
+ let medal=score>=120?"🥇":score>=80?"🥈":"🥉";
+ document.getElementById("medal").textContent=medal;
+ document.getElementById("resultTitle").textContent=score>=120?"زیست‌بوم‌ها را نجات دادی!":score>=80?"خیلی خوب بود!":"تلاش خوبی بود!";
+ document.getElementById("resultText").textContent=`امتیاز نهایی تو ${fa(score)} از ۱۵۰ است. ${score>=120?"تو یک قهرمان واقعی زیست‌بوم‌ها هستی!":"با مرور درس و یک بار بازی دوباره می‌توانی رکوردت را بهتر کنی."}`;
+}
+function restart(){index=0;score=0;lives=3;document.getElementById("result").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");show()}
+show();
+</script>
+</body>
+</html>
